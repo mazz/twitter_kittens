@@ -19,3 +19,40 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
+
+function loadTweets() {
+  $('#tweets').load('/tweets');
+}
+
+var App = {
+  setupTwitter: function setupTwitter() {
+    loadTweets();
+    $('#tweet-form-submit').click((ev) => {
+      ev.preventDefault();
+      $('#tweet-form-submit').hide();
+      $('#send-tweet-status').html('Sending...');
+
+      const $tweetForm = $('#tweet-form');
+      $.ajax(
+        {
+          url: $tweetForm.attr('action'),
+          type: $tweetForm.attr('method'),
+          data: $tweetForm.serialize(),
+        }
+      ).done((resp) => {
+        $('#send-tweet-status').html('');
+        $('#tweet-form-submit').show();
+        $('#twitter-alert').show().html(
+          `Tweet Sent. View at <a href='${resp.url}' target='_blank'>${resp.url}</a>`
+        );
+        window.setTimeout(function() { $('#twitter-alert').hide(); }, 5000);
+        loadTweets();
+      });
+
+    });
+  }
+};
+
+module.exports = {
+  App: App
+};
